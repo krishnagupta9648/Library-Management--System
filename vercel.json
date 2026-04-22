@@ -1,5 +1,7 @@
 {
-  "cleanUrls": true,
+  "version": 2,
+  "public": true,
+  "outputDirectory": "frontend/dist",
   "rewrites": [
     {
       "source": "/(.*)",

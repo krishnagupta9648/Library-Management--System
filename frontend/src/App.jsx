@@ -10,8 +10,11 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBook, setEditingBook] = useState(null)
+  
+  // NOTE: In a larger app, I'd probably use React Query or something similar for data fetching,
+  // but for this simple LMS, a basic useEffect with fetch is enough.
 
-  // Fetch initial data or search results
+  // Fetch initial data or search results with a small debounce to avoid spamming the API
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchData();
@@ -63,7 +66,7 @@ export default function App() {
           <div className="bg-primary p-2 rounded-lg">
             <BookIcon size={24} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold font-heading">LMS Pro</h1>
+          <h1 className="text-2xl font-bold font-heading">LMS - Library Manager</h1>
         </div>
 
         <nav className="nav-links-container">
@@ -110,8 +113,8 @@ export default function App() {
       <main className="content-area">
         <header className="flex justify-between items-center mb-12">
           <div>
-            <p className="text-text-muted text-sm capitalize">{activeTab} Section</p>
-            <h2 className="text-4xl font-bold mt-2 font-heading">Manage Your {activeTab}</h2>
+            <p className="text-text-muted text-sm capitalize">{activeTab} section</p>
+            <h2 className="text-4xl font-bold mt-2 font-heading">System {activeTab}</h2>
           </div>
         </header>
 
@@ -155,7 +158,7 @@ function DashboardView({ stats, books }) {
       </div>
 
       <div className="glass-card">
-        <h3 className="text-xl font-bold mb-8">Recent Books</h3>
+        <h3 className="text-xl font-bold mb-8">Recently Added Books</h3>
         <table className="data-table">
           <thead>
             <tr>
@@ -340,6 +343,9 @@ function BookModal({ book, onClose, onSuccess }) {
     </div>
   )
 }
+
+// --- Component Views for different sections ---
+
 function IssuedView({ onReturn }) {
   const [issues, setIssues] = useState([])
   const [loading, setLoading] = useState(false)
@@ -368,7 +374,7 @@ function IssuedView({ onReturn }) {
   return (
     <div className="glass-card animate-fade-in">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-bold">Issued Books Records</h3>
+        <h3 className="text-xl font-bold">Book Issue History</h3>
         <button className="btn btn-primary text-sm" onClick={() => fetchIssues()}>
           Refresh
         </button>

@@ -16,9 +16,9 @@ namespace LMS.API.Controllers
             _context = context;
         }
 
-        // POST: api/Issues/issue
+        // Process issuing a book to a user
         [HttpPost("issue")]
-        public async Task<IActionResult> IssueBook(int bookId, int userId)
+        public async Task<IActionResult> CheckoutBook(int bookId, int userId)
         {
             var book = await _context.Books.FindAsync(bookId);
             var user = await _context.Users.FindAsync(userId);
@@ -33,6 +33,9 @@ namespace LMS.API.Controllers
                 IssueDate = DateTime.UtcNow,
                 IsReturned = false
             };
+            
+            // Log this checkout (Basic tracking)
+            Console.WriteLine($"Book {bookId} checked out by user {userId}");
 
             book.AvailableCopies--;
             _context.BookIssues.Add(issue);
@@ -41,9 +44,9 @@ namespace LMS.API.Controllers
             return Ok(issue);
         }
 
-        // POST: api/Issues/return/{issueId}
+        // Standard return process for a borrowed book
         [HttpPost("return/{issueId}")]
-        public async Task<IActionResult> ReturnBook(int issueId)
+        public async Task<IActionResult> ProcessReturn(int issueId)
         {
             var issue = await _context.BookIssues.Include(i => i.Book).FirstOrDefaultAsync(i => i.Id == issueId);
 
@@ -63,15 +66,18 @@ namespace LMS.API.Controllers
             return Ok(issue);
         }
 
-        // GET: api/Issues
+        // Get history of all issues (current and returned)
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookIssue>>> GetIssues()
+        public async Task<ActionResult<IEnumerable<BookIssue>>> GetIssueHistory()
         {
             return await _context.BookIssues
                 .Include(i => i.Book)
                 .Include(i => i.User)
                 .OrderByDescending(i => i.IssueDate)
                 .ToListAsync();
+            
+            // TODO: Pagination might be needed if this list grows too large
+            return data;
         }
     }
 }

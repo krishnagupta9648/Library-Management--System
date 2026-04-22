@@ -1,66 +1,43 @@
-# Library Management System (LMS Pro)
+# Library Management System
 
-A modern, high-performance Library Management System built with **ASP.NET Core 8.0**, **React (Vite)**, and **MySQL**.
+This is a simple web application for managing a library's book catalog and tracking book issues to users. It was built using ASP.NET Core for the backend and React for the frontend.
 
-## Features
-- **Dashboard**: Real-time statistics on total books, issued books, and availability.
-- **Book Management**: Full CRUD operations for books (Add, Edit, Delete, View).
-- **Advanced Search**: Search for books by title, author, or ISBN.
-- **Issue & Return**: Seamlessly track book issues to users and handle returns.
-- **Availability Tracking**: Automatically manages stock levels of books.
-- **Premium UI**: Dark-themed glassmorphism design with responsive layouts and micro-animations.
+## How to get it running
 
-## Prerequisites
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Node.js (v18+)](https://nodejs.org/)
-- [MySQL Server (v8.0+)](https://dev.mysql.com/downloads/mysql/)
+### The easy way
+I've set up a root-level script that handles both the frontend and backend together.
+1. Make sure you have the .NET 8 SDK and Node.js installed.
+2. Run `npm install` in this root directory.
+3. Run `npm run dev`. This will start the React dev server and the .NET API at the same time.
 
-## Project Setup
+### Manual Setup
+If you want to run things separately:
 
-### 1. Database Configuration
-1. Open your MySQL client (e.g., MySQL Workbench or Command Line).
-2. Execute the script found in `database/schema.sql` to create the `LMS_DB` and initial tables.
-3. Update the connection string in `backend/appsettings.json`:
-   ```json
-   "ConnectionStrings": {
-     "DefaultConnection": "Server=localhost;Database=LMS_DB;User=root;Password=your_password;"
-   }
-   ```
+**1. Database**
+- Use a MySQL server and run the script in `database/schema.sql`.
+- Update the connection string in `backend/appsettings.json`.
 
-### 2. Backend Setup (.NET API)
-1. Navigate to the `backend` directory:
-   ```bash
-   cd backend
-   ```
-2. Restore dependencies:
-   ```bash
-   dotnet restore
-   ```
-3. Run the application:
-   ```bash
-   dotnet run
-   ```
-   The API will be available at `http://localhost:5000` (or `https://localhost:5001`).
+**2. Backend**
+- Go to the `backend` folder and run `dotnet run`.
 
-### 3. Frontend Setup (React)
-1. Navigate to the `frontend` directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   Open your browser at `http://localhost:3000`.
+**3. Frontend**
+- Go to the `frontend` folder, run `npm install`, and then `npm run dev`.
 
-## Architecture
-- **Backend**: Layered architecture using Entity Framework Core for data access and Pomelo for MySQL compatibility.
-- **Frontend**: Functional React components with custom CSS hooks for a design-token-driven approach.
-- **State Management**: React `useState` and `useEffect` for local state, with a modular `apiService` for backend integration.
+## How it works
 
-## License
-MIT
+### Structure
+The project is split into two main parts:
+- **Backend API**: Built with ASP.NET Core 8.0. It uses Entity Framework Core to talk to the MySQL database. I used a simple controller-based setup for handling books, users, and issues.
+- **Frontend UI**: Built with React (using Vite). I used custom CSS for the design (a dark glassmorphism theme) instead of a library like Tailwind to keep it lightweight.
+
+### Key Logic
+- **Stock Tracking**: When a book is issued, the system automatically subtracts from the "Available Copies". When it's returned, it adds the copy back.
+- **Offline Fallback**: I added a small mock-data layer in the frontend. If the backend isn't running, the app will still function using the browser's localStorage so you can test the UI properly.
+
+## Bonus Features
+The app includes the requested bonus tasks:
+- Tracking live availability for every book.
+- A dashboard with stats for total books, issued books, and availability.
+
+## About the Author
+Built by Krishna Kumar Gupta as part of the LMS assignment.

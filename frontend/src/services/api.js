@@ -1,26 +1,29 @@
 const API_BASE_URL = '/api';
 
-// Mock Data for fallback when backend is not running
+// Fallback logic for when the local API isn't running - saves to browser localStorage
 const getMockData = (key) => JSON.parse(localStorage.getItem(key) || '[]');
 const setMockData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
-// Initial Mock Seed
+// Initial Seed Data - just for testing UI
 if (!localStorage.getItem('mock_books')) {
+  console.log("Seeding local storage with starter books...");
   setMockData('mock_books', [
-    { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', isbn: '9780743273565', totalCopies: 5, availableCopies: 5, description: 'A classic novel of the Jazz Age.' },
-    { id: 2, title: '1984', author: 'George Orwell', isbn: '9780451524935', totalCopies: 3, availableCopies: 2, description: 'Dystopian social science fiction.' }
+    { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', isbn: '9780743273565', totalCopies: 5, availableCopies: 5, description: 'Classic jazz-age novel - a must read.' },
+    { id: 2, title: '1984', author: 'George Orwell', isbn: '9780451524935', totalCopies: 3, availableCopies: 2, description: 'Dystopian fiction - scarily relevant.' }
   ]);
   setMockData('mock_issues', []);
 }
 
 export const apiService = {
-  // Books
+  // --- Book Management ---
   getBooks: async (search) => {
     try {
       const response = await fetch(`${API_BASE_URL}/books${search ? `?search=${search}` : ''}`);
-      if (!response.ok) throw new Error('Backend error');
+      if (!response.ok) throw new Error('API server returned an error');
       return await response.json();
-    } catch {
+    } catch (err) {
+      // If server is down, we fall back to our local mock data
+      console.warn("Backend not reachable, using local storage fallback", err);
       let books = getMockData('mock_books');
       if (search) {
         books = books.filter(b => b.title.includes(search) || b.author.includes(search));
@@ -47,6 +50,7 @@ export const apiService = {
       return await response.json();
     } catch {
       const books = getMockData('mock_books');
+      // Create a fake ID using timestamp for our local mock
       const newBook = { ...book, id: Date.now(), availableCopies: book.totalCopies };
       setMockData('mock_books', [...books, newBook]);
       return newBook;
@@ -75,7 +79,7 @@ export const apiService = {
     }
   },
 
-  // Issues
+  // --- Issue/Return Logic ---
   getIssues: async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/issues`);

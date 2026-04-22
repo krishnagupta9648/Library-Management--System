@@ -7,6 +7,7 @@ namespace LMS.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Controller to manage book catalog operations
     public class BooksController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -16,9 +17,9 @@ namespace LMS.API.Controllers
             _context = context;
         }
 
-        // GET: api/Books
+        // Search books by title, author, or ISBN
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooks(string? search)
+        public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks(string? search)
         {
             var query = _context.Books.AsQueryable();
 
@@ -30,9 +31,9 @@ namespace LMS.API.Controllers
             return await query.ToListAsync();
         }
 
-        // GET: api/Books/5
+        // Get a specific book by its ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> GetBook(int id)
+        public async Task<ActionResult<Book>> GetBookDetails(int id)
         {
             var book = await _context.Books.FindAsync(id);
 
@@ -41,22 +42,24 @@ namespace LMS.API.Controllers
             return book;
         }
 
-        // POST: api/Books
+        // Add a new book to the library
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        public async Task<ActionResult<Book>> CreateNewBook(Book book)
         {
             book.AvailableCopies = book.TotalCopies;
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+            return CreatedAtAction(nameof(GetBookDetails), new { id = book.Id }, book);
         }
 
-        // PUT: api/Books/5
+        // Update existing book information
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBook(int id, Book book)
+        public async Task<IActionResult> UpdateBook(int id, Book book)
         {
-            if (id != book.Id) return BadRequest();
+            if (id != book.Id) return BadRequest("ID mismatch");
+            
+            // TODO: Add more validation here (e.g. check if total copies decreased below issued count)
 
             _context.Entry(book).State = EntityState.Modified;
 
@@ -73,9 +76,9 @@ namespace LMS.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Books/5
+        // Permanently remove a book
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBook(int id)
+        public async Task<IActionResult> RemoveBook(int id)
         {
             var book = await _context.Books.FindAsync(id);
             if (book == null) return NotFound();
